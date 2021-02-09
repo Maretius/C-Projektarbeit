@@ -1,0 +1,8 @@
+ToDo's zum GTK-Editor
+
+	- Datei Speichern
+	- Datei Öffnen
+	- Text einfügen
+	- Text kopieren
+	- Formatieren (ASCii, ANSI, UTF-8)
+	- Textzeile / Spalte anzeigen 
