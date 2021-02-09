@@ -2,7 +2,10 @@
 
 int main(int argc, char *argv[]) {
 
+  //Definitions
   GtkWidget *window;
+  GtkWidget *vbox;
+  GtkWidget *hbox;
 
   GtkWidget *menubar;
   GtkWidget *fileMenu;
@@ -19,30 +22,44 @@ int main(int argc, char *argv[]) {
   GtkWidget *asciiMi;
   GtkWidget *ansiMi;
   GtkWidget *utf8Mi;
+  
   GtkWidget *sep;
   GtkWidget *text_view;
   GtkWidget *scrolled_window;
   GtkTextBuffer *buffer;
-
+  
+ //initialize our gtk engine
   gtk_init(&argc, &argv);
 
+  //properties for the main window
   window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
   gtk_window_set_default_size(GTK_WINDOW(window), 500, 400);
   gtk_window_set_title(GTK_WINDOW(window), "GTK Editor");
 
+
+  //Setting up vbox and hbox
+  vbox = gtk_vbox_new(FALSE, 2);
+  hbox = gtk_hbox_new(FALSE, 2);
+  gtk_container_add(GTK_CONTAINER(window), vbox);
+  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, FALSE, 0);
+  
 	buffer = gtk_text_buffer_new (NULL);
 	text_view = gtk_text_view_new_with_buffer (buffer);
 	gtk_text_view_set_wrap_mode (GTK_TEXT_VIEW (text_view), GTK_WRAP_WORD); 
 	
 	scrolled_window = gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC); 
-
+	
+  //initialize menu bar
   menubar = gtk_menu_bar_new();
   fileMenu = gtk_menu_new();
   editMenu = gtk_menu_new();
   formatMenu = gtk_menu_new();
 
+  // Setting File Menu //
+
+  //initialize file menu and define file items in it
   fileMi = gtk_menu_item_new_with_label("File");
   editMi = gtk_menu_item_new_with_label("Edit");
   formatMi = gtk_menu_item_new_with_label("Format");
@@ -55,7 +72,8 @@ int main(int argc, char *argv[]) {
   ansiMi = gtk_menu_item_new_with_label("ANSI");
   utf8Mi = gtk_menu_item_new_with_label("UTF-8");
   sep = gtk_separator_menu_item_new();  
-
+  
+  //linking menu and its respective menu items
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(fileMi), fileMenu);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(editMi), editMenu);
   gtk_menu_item_set_submenu(GTK_MENU_ITEM(formatMi), formatMenu);
@@ -72,16 +90,27 @@ int main(int argc, char *argv[]) {
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), editMi);
   gtk_menu_shell_append(GTK_MENU_SHELL(menubar), formatMi);
 
-    gtk_container_add (GTK_CONTAINER (scrolled_window), text_view);
-	gtk_container_set_border_width (GTK_CONTAINER (scrolled_window), 5);
-	gtk_container_add (GTK_CONTAINER (window), scrolled_window);
 
-    gtk_box_pack_start(GTK_SCROLLEDWINDOW(scrolled_window), menubar, FALSE, FALSE, 0);
-    
+ //connecting layout of verticalbox to menubar
+  gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
+
+  //Initializing scrolledwindows
+  scrolled_window = gtk_scrolled_window_new(NULL,NULL);
+
+  //Initializing textviewer and displaying it.
+  text_view = gtk_text_view_new ();
+  //Falls wir noch die Border ändern wollen aber sieht kacke aus
+  //gtk_container_set_border_width (GTK_CONTAINER (scrolled_window), 5);
+  gtk_container_add(GTK_CONTAINER(scrolled_window),text_view);
+  gtk_box_pack_start (GTK_BOX (vbox), scrolled_window, 1, 1, 0);
+
+
+  //connect functions to events that is signalled by gtk
   g_signal_connect(G_OBJECT(window), "destroy",G_CALLBACK(gtk_main_quit), NULL);
 
   g_signal_connect(G_OBJECT(exitMi), "activate", G_CALLBACK(gtk_main_quit), NULL);
 
+  // display all the windows and enter into event loop
   gtk_widget_show_all(window);
 
   gtk_main();
