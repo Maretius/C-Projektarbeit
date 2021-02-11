@@ -1,19 +1,37 @@
-#include<stdio.h>                                                                                           
-#include<stdlib.h>    
-                                                                                     
-   // The sample buffer contains "©ha®a©te®s" in UTF-8
-    unsigned char buffer[15] = { 0xc2, 0xa9, 0x68, 0x61, 0xc2, 0xae, 0x61, 0xc2, 0xa9, 0x74, 0x65, 0xc2, 0xae, 0x73, 0x00 };
-    // utf8 is the pointer to your UTF-8 string
-    char* utf8 = (char*)buffer;
-    // convert multibyte UTF-8 to wide string UTF-16
-    int length = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)utf8, -1, NULL, 0);
-    if (length > 0)
-    {
-        wchar_t* wide = new wchar_t[length];
-        MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)utf8, -1, wide, length);
+#include <curses.h>
 
-        // convert it to ANSI, use setlocale() to set your locale, if not set
-        size_t convertedChars = 0;
-        char* ansi = new char[length];
-        wcstombs_s(&convertedChars, ansi, length, wide, _TRUNCATE);
-    }
+int main (void) {
+  int i, j;
+  initscr ();
+  // Ecke links oben
+  addch (ACS_ULCORNER);
+  // Eine horizontale Linie
+  for (i = 0; i < 20; i++)
+     addch (ACS_HLINE);
+  // Ecke rechts oben
+  addch (ACS_URCORNER);
+  addch ('\n');
+  // vertikale Linie rechts und links (21 Zeilen)
+  for (i = 0; i < 10; i++)
+    for (j = 0; j <= 21; j++)
+      if (j == 0)
+        addch (ACS_VLINE);
+      else if (j == 21) {
+        addch (ACS_VLINE);
+        addch ('\n');
+      } 
+      else
+        addch (' ');
+  // Ecke links unten
+  addch (ACS_LLCORNER);
+  // Eine horizontale Linie
+  for (i = 0; i < 20; i++)
+    addch (ACS_HLINE);
+  // Ecke rechts unten
+  addch (ACS_LRCORNER);
+  addch ('\n');
+  mvprintw (5, 7, "<TASTE>");
+  getch ();
+  endwin ();
+  return 0;
+}
