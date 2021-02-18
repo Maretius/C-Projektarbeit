@@ -4,6 +4,8 @@
 #include <curses.h>
 #include <math.h>
 
+
+//test
 void zeichne_balken(int index, float score) {
 			
 	int i, j, score_round;
