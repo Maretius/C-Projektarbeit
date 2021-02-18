@@ -6,24 +6,26 @@
 
 
 //test
-void zeichne_balken(int index, float score) {
+void zeichne_balken(int index, int memorysize, float score) {
 			
-	int i, j, score_round;
+	int i, j, start_line, score_round;
+	start_line = 3;
 	score_round = round(score*10);
-	attrset(A_NORMAL);
+	mvprintw (index*3+1, 1, "%d", memorysize);
+	move(index*3, 8);
 	addch (ACS_ULCORNER);
 	for (i = 0; i < score_round; i++) {
 		addch (ACS_HLINE);
 	}
 	addch (ACS_URCORNER);
-	addch ('\n');
+	move(index*3+1, 8);
 	for (i = 0; i < 1; i++) {
 		for (j = 0; j <= score_round+1; j++) {
 			if (j == 0) {
 				addch (ACS_VLINE);
 			} else if (j == score_round+1) {
 				addch (ACS_VLINE);
-				addch ('\n');
+				move(index*3+2, 8);
 			} else {
 				addch (' ');
 			}
@@ -34,10 +36,9 @@ void zeichne_balken(int index, float score) {
 		addch (ACS_HLINE);
     }
 	addch (ACS_LRCORNER);
-	addch ('\n');
 	attrset(A_BOLD);
-	mvprintw (index*3-2, score_round+3, "%.2f", score);
-	mvprintw (index*3, 0, "");
+	mvprintw (index*3-2 + start_line, 10, "%.2f", score);
+	attrset(A_NORMAL);
 }
 
 double measure_time(int array_size)
@@ -67,26 +68,55 @@ double measure_time(int array_size)
 	}
 }
 
+void benchmark(){
+ 	double zeitSum, score, diver;
+ 	int numbers[] = {1000,2000,4000,8000,16000,32000,64000};
+ 	int i;
+
+	for (i = 1; i < 8; i++) {
+		diver = numbers[i-1] / 1000;
+ 		zeitSum = measure_time(numbers[i-1]) / diver;
+ 		score = zeitSum * 10000;
+ 		if (zeitSum != 0) {
+			zeichne_balken(i, numbers[i-1], score);
+		} else {
+			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
+		}
+	}
+}
+
+void deleteEverything(){
+	for(int i = 3; i < 24; i++){
+		move (i, 0);
+		// Zeile löschen
+		deleteln();
+		insertln();
+	}
+}
+
 int main()
 {
- 	double zeitSum;
- 	int numbers[] = {1000,2000,4000,8000,16000,32000,64000};
- 	double score, diver;
-  
+ 	int c;
+
 	initscr ();
 	// Cursor und Funktionstasten ein
 	keypad (stdscr, TRUE); 
 	// keine Ausgabe
 	noecho ();
-	
-	for (int i = 1; i < 8; i++) {
-		diver = numbers[i-1] / 1000;
- 		zeitSum = measure_time(numbers[i-1]) / diver;
- 		score = zeitSum * 1000;
- 		if (zeitSum != 0) {
-			zeichne_balken(i, score);
-		} else {
-			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
+	attrset(A_BOLD);
+	mvprintw (1, 3, "[Benchmark für Speichergeschwindigkeit]");
+	mvprintw (24, 1, "Size           Score");
+	mvprintw (26, 1, "Press x for reload und q for quit");
+	attrset(A_NORMAL);
+	benchmark();
+	while ((c = getch ()) != 'q') {
+		switch (c) {
+			case 120:
+				deleteEverything();
+				benchmark();
+				break;
+			default:
+				benchmark();
 		}
 	}
 	getch ();
