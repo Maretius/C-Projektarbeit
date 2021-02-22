@@ -55,7 +55,7 @@ double measure_time(int array_size)
 	if(array != NULL) {
 		for (int j = 0; j <= array_size; j++) {
 			zuweisen_clock = clock();
-			array[j] = 0;
+			array[j] = 9999999;
 			zuweisen_clock = clock() - zuweisen_clock;
 			zuweisen_time = ((double)zuweisen_clock) / CLOCKS_PER_SEC;
 			zuweisen_time_ges = zuweisen_time_ges + zuweisen_time;
@@ -75,8 +75,8 @@ void benchmark(){
 
 	for (i = 1; i < 8; i++) {
 		diver = numbers[i-1] / 1000;
- 		zeitSum = measure_time(numbers[i-1]) / diver;
- 		score = zeitSum * 10000;
+ 		zeitSum = measure_time(numbers[i-1]) ; // diver;
+ 		score = zeitSum * 1000;
  		if (zeitSum != 0) {
 			zeichne_balken(i, numbers[i-1], score);
 		} else {
@@ -116,6 +116,7 @@ int main()
 				benchmark();
 				break;
 			default:
+				deleteEverything();
 				benchmark();
 		}
 	}
