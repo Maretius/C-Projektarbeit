@@ -5,27 +5,27 @@
 #include <math.h>
 
 
-//test
+
 void zeichne_balken(int index, int memorysize, float score) {
 			
 	int i, j, start_line, score_round;
 	start_line = 3;
 	score_round = round(score*10);
-	mvprintw (index*3+1, 1, "%d", memorysize);
-	move(index*3, 8);
+	mvprintw (index*3+1, 6, "%d", memorysize);
+	move(index*3, 13);
 	addch (ACS_ULCORNER);
 	for (i = 0; i < score_round; i++) {
 		addch (ACS_HLINE);
 	}
 	addch (ACS_URCORNER);
-	move(index*3+1, 8);
+	move(index*3+1, 13);
 	for (i = 0; i < 1; i++) {
 		for (j = 0; j <= score_round+1; j++) {
 			if (j == 0) {
 				addch (ACS_VLINE);
 			} else if (j == score_round+1) {
 				addch (ACS_VLINE);
-				move(index*3+2, 8);
+				move(index*3+2, 13);
 			} else {
 				addch (' ');
 			}
@@ -37,11 +37,11 @@ void zeichne_balken(int index, int memorysize, float score) {
     }
 	addch (ACS_LRCORNER);
 	attrset(A_BOLD);
-	mvprintw (index*3-2 + start_line, 10, "%.2f", score);
+	mvprintw (index*3-2 + start_line, 15, "%.2f", score);
 	attrset(A_NORMAL);
 }
 
-double measure_time(int array_size)
+double measure_time_ram(int array_size)
 {
 	long *array;
 	double malloc_time, zuweisen_time, zuweisen_time_ges;
@@ -55,7 +55,7 @@ double measure_time(int array_size)
 	if(array != NULL) {
 		for (int j = 0; j <= array_size; j++) {
 			zuweisen_clock = clock();
-			array[j] = 9999999;
+			array[j] = 0;
 			zuweisen_clock = clock() - zuweisen_clock;
 			zuweisen_time = ((double)zuweisen_clock) / CLOCKS_PER_SEC;
 			zuweisen_time_ges = zuweisen_time_ges + zuweisen_time;
@@ -68,35 +68,69 @@ double measure_time(int array_size)
 	}
 }
 
+double measure_time_hdd(const unsigned long long size){
+	FILE *fp;
+	unsigned long long a[size];
+	double time_clock, time_time;
+	
+	time_clock = clock();
+	
+	fp = fopen("test.binary", "wb");
+	for (unsigned long long j = 0; j < 1024; ++j){
+    	fwrite(a, 1, size*sizeof(unsigned long long), fp);
+	}
+	fclose(fp);
+	
+	time_clock = clock() - time_clock;
+	time_time = (double)time_clock / CLOCKS_PER_SEC;
+	
+	return time_time;
+}
+
 void benchmark(){
  	double zeitSum, score, diver;
- 	int numbers[] = {1000,2000,4000,8000,16000,32000,64000};
+ 	int numbersRAM[] = {1000, 2000, 4000, 8000};
+ 	unsigned long long numbersHDD[] = {16384ULL, 32768ULL, 65536ULL, 131072ULL};
  	int i;
 
-	for (i = 1; i < 8; i++) {
-		diver = numbers[i-1] / 1000;
- 		zeitSum = measure_time(numbers[i-1]) ; // diver;
+	
+	for (i = 1; i < 5; i++) {
+		//diver = numbers[i-1] / 1000;
+ 		zeitSum = measure_time_ram(numbersRAM[i-1]) ; // diver;
  		score = zeitSum * 1000;
  		if (zeitSum != 0) {
-			zeichne_balken(i, numbers[i-1], score);
+			zeichne_balken(i, numbersRAM[i-1], score);
 		} else {
 			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
 		}
 	}
+	
+	mvprintw (i*3+1, 0, "______________________________________________________________");
+	i++;	
+	for(i; i < 10; i++){
+		zeitSum = measure_time_hdd(numbersHDD[i-6]);
+		score = zeitSum;
+		if (zeitSum != 0) {
+			zeichne_balken(i, numbersHDD[i-6]*8, score);
+		} else {
+			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
+		}
+	}
+	
 }
 
 void deleteEverything(){
-	for(int i = 3; i < 24; i++){
-		move (i, 0);
-		// Zeile löschen
-		deleteln();
-		insertln();
+	for(int i = 3; i < 30; i++){
+		mvprintw (i, 6, "                                                                                                                                              ");
+	//	move (i, 6);
+		//deleteln();
+		//insertln();
 	}
 }
 
 int main()
 {
- 	int c;
+ 	int keyboardbutton;
 
 	initscr ();
 	// Cursor und Funktionstasten ein
@@ -105,12 +139,14 @@ int main()
 	noecho ();
 	attrset(A_BOLD);
 	mvprintw (1, 3, "[Benchmark für Speichergeschwindigkeit]");
-	mvprintw (24, 1, "Size           Score");
-	mvprintw (26, 1, "Press x for reload und q for quit");
+	mvprintw (3, 1, "RAM");
+    mvprintw (18, 1, "HDD");
+	mvprintw (30, 6, "Size           Score");
+	mvprintw (32, 1, "Press x for reload und q for quit");
 	attrset(A_NORMAL);
 	benchmark();
-	while ((c = getch ()) != 'q') {
-		switch (c) {
+	while ((keyboardbutton = getch ()) != 'q') {
+		switch (keyboardbutton) {
 			case 120:
 				deleteEverything();
 				benchmark();
