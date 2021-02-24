@@ -5,7 +5,7 @@
 #include <math.h>
 
 
-
+//miep
 void zeichne_balken(int index, int memorysize, float score) {
 			
 	int i, j, start_line, score_round;
