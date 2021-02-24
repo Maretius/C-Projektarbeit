@@ -12,20 +12,20 @@ void zeichne_balken(int index, int memorysize, float score) {
 	start_line = 3;
 	score_round = round(score*10);
 	mvprintw (index*3+1, 6, "%d", memorysize);
-	move(index*3, 13);
+	move(index*3, 14);
 	addch (ACS_ULCORNER);
 	for (i = 0; i < score_round; i++) {
 		addch (ACS_HLINE);
 	}
 	addch (ACS_URCORNER);
-	move(index*3+1, 13);
+	move(index*3+1, 14);
 	for (i = 0; i < 1; i++) {
 		for (j = 0; j <= score_round+1; j++) {
 			if (j == 0) {
 				addch (ACS_VLINE);
 			} else if (j == score_round+1) {
 				addch (ACS_VLINE);
-				move(index*3+2, 13);
+				move(index*3+2, 14);
 			} else {
 				addch (' ');
 			}
@@ -37,7 +37,7 @@ void zeichne_balken(int index, int memorysize, float score) {
     }
 	addch (ACS_LRCORNER);
 	attrset(A_BOLD);
-	mvprintw (index*3-2 + start_line, 15, "%.2f", score);
+	mvprintw (index*3-2 + start_line, 16, "%.2f", score);
 	attrset(A_NORMAL);
 }
 
@@ -84,7 +84,7 @@ double measure_time_hdd(const unsigned long long size){
 	time_clock = clock() - time_clock;
 	time_time = (double)time_clock / CLOCKS_PER_SEC;
 	
-	return time_time;
+	return time_time*10;
 }
 
 void benchmark(){
@@ -99,13 +99,13 @@ void benchmark(){
  		zeitSum = measure_time_ram(numbersRAM[i-1]) ; // diver;
  		score = zeitSum * 1000;
  		if (zeitSum != 0) {
-			zeichne_balken(i, numbersRAM[i-1], score);
+			zeichne_balken(i, numbersRAM[i-1]*8, score);
 		} else {
 			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
 		}
 	}
 	
-	mvprintw (i*3+1, 0, "______________________________________________________________");
+	mvprintw (i*3+1, 0, "___________________________________________________________________________________________________________");
 	i++;	
 	for(i; i < 10; i++){
 		zeitSum = measure_time_hdd(numbersHDD[i-6]);
@@ -141,7 +141,8 @@ int main()
 	mvprintw (1, 3, "[Benchmark für Speichergeschwindigkeit]");
 	mvprintw (3, 1, "RAM");
     mvprintw (18, 1, "HDD");
-	mvprintw (30, 6, "Size           Score");
+    mvprintw (15, 3, "Size in Byte        Score in ms ");
+	mvprintw (30, 3, "Size in Byte        Score in 100ms ");
 	mvprintw (32, 1, "Press x for reload und q for quit");
 	attrset(A_NORMAL);
 	benchmark();

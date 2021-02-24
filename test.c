@@ -12,7 +12,7 @@ int main() {
    time_clock = clock();
    
    fp = fopen("test.binary", "wb");
-   for (unsigned long long j = 0; j < 1024; ++j){
+   for (int j = 0; j < 1024; ++j){
         //Some calculations to fill a[]
         fwrite(a, 1, size*sizeof(unsigned long long), fp);
     }
