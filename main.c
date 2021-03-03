@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <curses.h>
 #include <math.h>
-
-int windowRow, windowCol; 
 
 void drawScoreBar(int index, int memorysize, float score) {		
 	int i, j, start_line, score_round;
@@ -67,7 +66,7 @@ double measureTimeRam(int array_size)
 	}
 }
 
-double measure_time_hdd(const unsigned long long size)
+double measureTimeStorage(const unsigned long long size)
 {
 	FILE *fp;
 	unsigned long long a[size];
@@ -80,6 +79,7 @@ double measure_time_hdd(const unsigned long long size)
     	fwrite(a, 1, size*sizeof(unsigned long long), fp);
 	}
 	fclose(fp);
+	remove("test.binary");
 	
 	time_clock = clock() - time_clock;
 	time_time = (double)time_clock / CLOCKS_PER_SEC;
@@ -89,35 +89,39 @@ double measure_time_hdd(const unsigned long long size)
 
 void benchmark()
 {
- 	double zeitSum, score, diver;
+ 	double zeitSum, score;
  	int numbersRAM[] = {1000, 2000, 4000, 8000};
  	unsigned long long numbersHDD[] = {16384ULL, 32768ULL, 65536ULL, 131072ULL};
  	int i;
 
 	
+	
 	for (i = 1; i < 5; i++) {
-		//diver = numbers[i-1] / 1000;
- 		zeitSum = measureTimeRam(numbersRAM[i-1]) ; // diver;
+		attrset(COLOR_PAIR(1));
+ 		zeitSum = measureTimeRam(numbersRAM[i-1]);
  		score = zeitSum * 1000;
  		if (zeitSum != 0) {
 			drawScoreBar(i, numbersRAM[i-1]*8, score);
 		} else {
 			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
 		}
+		refresh();
 	}
+	attrset(COLOR_PAIR(2));
+
 	
-	mvprintw (i*3+1, 0, "___________________________________________________________________________________________________________");
-	// move (i*3+1, 0);
-	// for (int i = 0;  i < windowCol;  i++, printw("%c", '-'));
+	
 	i++;	
 	for(i; i < 10; i++){
-		zeitSum = measure_time_hdd(numbersHDD[i-6]);
+		attrset(COLOR_PAIR(1));
+		zeitSum = measureTimeStorage(numbersHDD[i-6]);
 		score = zeitSum;
 		if (zeitSum != 0) {
 			drawScoreBar(i, numbersHDD[i-6]*8, score);
 		} else {
 			mvprintw (i*3-2, 3, "Kein freier Speicher vorhanden!");
 		}
+		refresh();
 	}
 	
 }
@@ -125,44 +129,58 @@ void benchmark()
 void deleteScores()
 {
 	for(int i = 3; i < 30; i++){
-		mvprintw (i, 6, "                                                                                                                                              ");
+		move (i, 13);
+		if (i != 1 && i != 15 && i != 16){
+			for (int i = 0;  i < (127);  i++, printw("%c", ' '));
+		}
 	}
 }
 
 int main()
 {
- 	int keyboardbutton;
-	char title[] = "[Benchmark für Speichergeschwindigkeit]";
+ 	int keyboardButton;
+
+	// Terminalgröße auf 34 Zeilen und 140 Spalten
+	printf("\e[8;34;140t");
 
 	initscr ();
-	// Größe des Curses-Fensters bestimmen
-	getmaxyx(stdscr, maxrow, maxcol);
+	setscrreg (0, 32);
+	scrollok (stdscr, TRUE);
+	
+	// Initialisierung der Farben
+	start_color();
+	init_pair(1, COLOR_GREEN, COLOR_BLACK );
+	init_pair(2, COLOR_WHITE, COLOR_BLACK );
+	init_pair(3, COLOR_CYAN, COLOR_BLACK );
+	init_pair(4, COLOR_YELLOW, COLOR_BLACK );
 	// Cursor und Funktionstasten ein
 	keypad (stdscr, TRUE); 
 	// keine Ausgabe
 	noecho ();
-	attrset(A_BOLD);
+	attrset(A_BOLD | COLOR_PAIR(2));
 	// Titel oben in der Mitte schreiben
-	mvprintw (1, (windowCol-strlen(title))/2);
+	mvprintw (1, 54, "[ Benchmark for memory speeds ]");
 	mvprintw (3, 1, "RAM");
-	mvprintw (18, 1, "HDD");
-	mvprintw (15, 3, "Size in Byte        Score in ms ");
-	mvprintw (30, 3, "Size in Byte        Score in 100ms ");
-	mvprintw (32, 1, "Press x for reload und q for quit");
-	attrset(A_NORMAL);
+	mvprintw (18, 1, "Storage");
+	move (16, 0);
+	for (int i = 0;  i < 140;  i++, printw("%c", '_'));
+	attrset(COLOR_PAIR(3));
+	mvprintw (15, 2, "Size in Byte     Score in ms ");
+	mvprintw (30, 2, "Size in Byte     Score in 100ms ");
+	attrset(COLOR_PAIR(4));
+	mvprintw (32, 53, "Press r for reload und q for quit.");
+	attrset(A_NORMAL | COLOR_PAIR(1));
 	benchmark();
-	while ((keyboardbutton = getch ()) != 'q') {
-		switch (keyboardbutton) {
-			case 120:
+	while ((keyboardButton = getch()) != 'q') {
+		switch (keyboardButton) {
+			case 114:
 				deleteScores();
 				benchmark();
 				break;
 			default:
-				deleteScores();
-				benchmark();
+				break;
 		}
 	}
-	getch ();
 	endwin ();
 	return 0;
 }
