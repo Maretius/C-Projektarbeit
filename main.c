@@ -7,9 +7,8 @@
 
 void drawScoreBar(int index, int memorysize, float score)
 {		
-	int i, j, start_line, score_round;
+	int i, j, score_round;
 	
-	start_line = 3;
 	score_round = round(score*10);
 	mvprintw (index*3+1, 6, "%d", memorysize);
 	move(index*3, 14);
@@ -37,7 +36,7 @@ void drawScoreBar(int index, int memorysize, float score)
     }
 	addch (ACS_LRCORNER);
 	attrset(A_BOLD);
-	mvprintw (index*3-2 + start_line, 16, "%.2f", score);
+	mvprintw (index*3+1, 16, "%.2f", score);
 	attrset(A_NORMAL);
 }
 
@@ -71,14 +70,14 @@ double measureTimeRam(int array_size)
 double measureTimeStorage(const unsigned long long size)
 {
 	FILE *fp;
-	unsigned long long a[size];
+	unsigned long long array[size];
 	double time_clock, time_time;
 	
 	time_clock = clock();
 	
 	fp = fopen("test.binary", "wb");
 	for (unsigned long long j = 0; j < 1024; ++j){
-    	fwrite(a, 1, size*sizeof(unsigned long long), fp);
+    	fwrite(array, 1, size*sizeof(unsigned long long), fp);
 	}
 	fclose(fp);
 	remove("test.binary");
@@ -86,7 +85,7 @@ double measureTimeStorage(const unsigned long long size)
 	time_clock = clock() - time_clock;
 	time_time = (double)time_clock / CLOCKS_PER_SEC;
 	
-	return time_time*10;
+	return time_time;
 }
 
 void benchmark()
@@ -112,7 +111,7 @@ void benchmark()
 	for(i; i < 10; i++){
 		attrset(COLOR_PAIR(1));
 		zeitSum = measureTimeStorage(numbersHDD[i-6]);
-		score = zeitSum;
+		score = zeitSum*10;
 		if (zeitSum != 0) {
 			drawScoreBar(i, numbersHDD[i-6]*8, score);
 		} else {
