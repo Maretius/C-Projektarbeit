@@ -13,7 +13,6 @@ void drawScoreBar(int index, int memorysize, float score)
 	mvprintw(index*3+1, 6, "%d", memorysize);
 	move(index*3, 14);
 	addch(ACS_ULCORNER);
-	addch();
 	for (i = 0; i < score_round; i++) {
 		addch (ACS_HLINE);
 	}
