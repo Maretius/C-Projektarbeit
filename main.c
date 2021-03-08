@@ -10,33 +10,34 @@ void drawScoreBar(int index, int memorysize, float score)
 	int i, j, score_round;
 	
 	score_round = round(score*10);
-	mvprintw (index*3+1, 6, "%d", memorysize);
+	mvprintw(index*3+1, 6, "%d", memorysize);
 	move(index*3, 14);
-	addch (ACS_ULCORNER);
+	addch(ACS_ULCORNER);
+	addch();
 	for (i = 0; i < score_round; i++) {
 		addch (ACS_HLINE);
 	}
-	addch (ACS_URCORNER);
+	addch(ACS_URCORNER);
 	move(index*3+1, 14);
 	for (i = 0; i < 1; i++) {
 		for (j = 0; j <= score_round+1; j++) {
 			if (j == 0) {
-				addch (ACS_VLINE);
+				addch(ACS_VLINE);
 			} else if (j == score_round+1) {
-				addch (ACS_VLINE);
+				addch(ACS_VLINE);
 				move(index*3+2, 14);
 			} else {
 				addch (' ');
 			}
 		}
 	}
-	addch (ACS_LLCORNER);
+	addch(ACS_LLCORNER);
 	for (i = 0; i < score_round; i++) {
-		addch (ACS_HLINE);
+		addch(ACS_HLINE);
     }
-	addch (ACS_LRCORNER);
+	addch(ACS_LRCORNER);
 	attrset(A_BOLD);
-	mvprintw (index*3+1, 16, "%.2f", score);
+	mvprintw(index*3+1, 16, "%.2f", score);
 	attrset(A_NORMAL);
 }
 
@@ -69,17 +70,17 @@ double measureTimeRam(int array_size)
 
 double measureTimeStorage(const unsigned long long size)
 {
-	FILE *fp;
+	FILE *file;
 	unsigned long long array[size];
 	double time_clock, time_time;
 	
 	time_clock = clock();
 	
-	fp = fopen("test.binary", "wb");
+	file = fopen("test.binary", "wb");
 	for (unsigned long long j = 0; j < 1024; ++j){
-    	fwrite(array, 1, size*sizeof(unsigned long long), fp);
+    	fwrite(array, 1, size*sizeof(unsigned long long), file);
 	}
-	fclose(fp);
+	fclose(file);
 	remove("test.binary");
 	
 	time_clock = clock() - time_clock;
@@ -92,12 +93,12 @@ void benchmark()
 {
  	double zeitSum, score;
  	int i, numbersRAM[] = {1000, 2000, 4000, 8000};
- 	unsigned long long numbersHDD[] = {16384ULL, 32768ULL, 65536ULL, 131072ULL};
+ 	unsigned long long numbersStorage[] = {16384ULL, 32768ULL, 65536ULL, 131072ULL};
 	
 	for (i = 1; i < 5; i++) {
 		attrset(COLOR_PAIR(1));
  		zeitSum = measureTimeRam(numbersRAM[i-1]);
- 		score = zeitSum * 1000;
+ 		score = zeitSum * 1000; // Sekunde zu Millisekunde
  		if (zeitSum != 0) {
 			drawScoreBar(i, numbersRAM[i-1]*8, score);
 		} else {
@@ -110,10 +111,10 @@ void benchmark()
 	i++;	
 	for(i; i < 10; i++){
 		attrset(COLOR_PAIR(1));
-		zeitSum = measureTimeStorage(numbersHDD[i-6]);
-		score = zeitSum*10;
+		zeitSum = measureTimeStorage(numbersStorage[i-6]);
+		score = zeitSum * 10;  // Sekunde zu 100 Millisekunden
 		if (zeitSum != 0) {
-			drawScoreBar(i, numbersHDD[i-6]*8, score);
+			drawScoreBar(i, numbersStorage[i-6]*8, score);
 		} else {
 			mvprintw(i*3-2, 3, "Kein freier Speicher vorhanden!");
 		}
@@ -151,8 +152,7 @@ int main()
 	
 	// Cursor und Funktionstasten ein
 	keypad(stdscr, TRUE); 
-	
-	// keine Ausgabe
+	// keine Ausgabe im Terminal
 	noecho();
 	
 	// Titel und Infos schreiben
