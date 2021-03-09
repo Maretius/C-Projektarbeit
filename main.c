@@ -76,7 +76,7 @@ double measureTimeStorage(const unsigned long long size)
 	time_clock = clock();
 	
 	file = fopen("test.binary", "wb");
-	for (unsigned long long j = 0; j < 1024; ++j){
+	for (unsigned long long j = 0; j < 1000; ++j){
     	fwrite(array, 1, size*sizeof(unsigned long long), file);
 	}
 	fclose(file);
@@ -92,7 +92,7 @@ void benchmark()
 {
  	double zeitSum, score;
  	int i, numbersRAM[] = {1000, 2000, 4000, 8000};
- 	unsigned long long numbersStorage[] = {16384ULL, 32768ULL, 65536ULL, 131072ULL};
+ 	unsigned long long numbersStorage[] = {15625, 31250, 62500, 125000};
 	
 	for (i = 1; i < 5; i++) {
 		attrset(COLOR_PAIR(1));
@@ -163,7 +163,7 @@ int main()
 	for (int i = 0;  i < 140;  i++, printw("%c", '_'));
 	attrset(COLOR_PAIR(3));
 	mvprintw(15, 2, "Size in Byte     Score in ms ");
-	mvprintw(30, 2, "Size in Byte     Score in 100ms ");
+	mvprintw(30, 2, "Size in kB       Score in 100ms ");
 	attrset(COLOR_PAIR(4));
 	mvprintw(32, 53, "Press r for reload und q for quit.");
 	attrset(A_NORMAL | COLOR_PAIR(1));
